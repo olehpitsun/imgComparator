@@ -1,5 +1,6 @@
 package imgComparator.distanceMethods.Frechet;
 
+import imgComparator.distanceMethods.IComparator;
 import imgComparator.tools.Contour;
 import imgComparator.tools.GeometryUtils;
 import imgComparator.tools.ImageOperations;
@@ -10,14 +11,16 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Created by Oleh7 on 1/24/2016.
+ * Created by Vadym on 19.01.2016.
  */
-public class Frechet {
+public class Frechet implements IComparator {
+    public boolean isGromovMode() {
+        return false;
+    }
+
     private double ca[][];
     private List<Point> contourA;
     private List<Point> contourB;
-    private List<Point> _contourPointsA;
-    private List<Point> _contourPointsB;
 
     private double c(int i, int j) {
         if(this.ca[i][j] > -1) {
@@ -55,34 +58,10 @@ public class Frechet {
         return this.c(aSize-1, bSize-1);
     }
 
-    /**
-     * метод визначення відстані для метолу Ферше
-     * перетворення List<MatOfPoint> в List<Point>
-     *
-     * @param contour1
-     * @param contour2
-     * @return
-     */
-    public double getDistance(List<MatOfPoint> contour1, List<MatOfPoint> contour2) {
-        Contour cp = new Contour();
 
-        for (MatOfPoint contourA : contour1) {
-            _contourPointsA = cp.convertMatOfPointToPoint(contourA.toList());
-        }
-        for (MatOfPoint contourB : contour2) {
-            _contourPointsB = cp.convertMatOfPointToPoint(contourB.toList());
-        }
-        return this.frechet(_contourPointsA, _contourPointsB);
-    }
-
-    /**
-     * метод, який визивається в GromovFerchet
-     * @param contour1
-     * @param contour2
-     * @return
-     */
-    public double getFrechetDistance(List<Point> contour1, List<Point> contour2) {
+    public double getDistance(List<Point> contour1, List<Point> contour2) {
         return this.frechet(contour1, contour2);
     }
 }
+
 

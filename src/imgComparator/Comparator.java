@@ -13,51 +13,34 @@ import java.util.List;
  * Created by Vadym on 10.01.2016.
  */
 public class Comparator {
-
-    public ImageOperations imageOperations;
+    protected int distancesCount = 2;
 
     public double compare(String image1, String image2) {
-        this.imageOperations = new ImageOperations();
+        ImageOperations imageOperations = new ImageOperations();
 
-        Mat imgA = this.imageOperations.readImage(image1);
-        Mat imgB = this.imageOperations.readImage(image2);
+        Mat imgA = imageOperations.readImage(image1);
+        Mat imgB = imageOperations.readImage(image2);
 
-        List<MatOfPoint> contoursA = getReducedContours(imgA,30);
-        List<MatOfPoint> contoursB = getReducedContours(imgB,30);
+        List<MatOfPoint> contoursA = imageOperations.getReducedContours(imgA, 30);
+        List<MatOfPoint> contoursB = imageOperations.getReducedContours(imgB, 30);
 
-        Frechet fr = new Frechet();
-        double FRresult = fr.getDistance(contoursA, contoursB);
-        System.out.println("Ферше: " + FRresult);
-
-        GromovFrechet gromovFrechet = new GromovFrechet();
-        double GRFRresult = gromovFrechet.getDistance(contoursA, contoursB);
-        System.out.println("Громов - Ферше: " + GRFRresult);
-
-        return 0;
+        return execute(contoursA, contoursB);
     }
 
-    /**
-     * Можливо пригодиться і прийдеться щось додумати, бо в Інших немає параметру pointsToLeave
-     * @param img
-     * @param pointsToLeave
-     * @return
-     */
-    private List<MatOfPoint> getReducedContours(Mat img, int pointsToLeave){
+    protected double execute(List<MatOfPoint> contoursA, List<MatOfPoint> contoursB) {
+        double[] results = new double[this.distancesCount];
+        double[] distancesRanks = new double[this.distancesCount];
+        distancesRanks[0] = 0.5;
+        distancesRanks[1] = 0.5;
 
-        List<MatOfPoint> contour = this.imageOperations.getReducedContours(img, pointsToLeave);
-        return contour;
-    }
-
-    /*
-    public double asd(List<MatOfPoint> contour1, List<MatOfPoint> contour2, List<IComparator> icontour) {
         boolean firstIteration = true;
-        Frechet frechet = new Frechet();
-        double result = 0.0;
 
-        List<Double> res = new ArrayList<>();
+        IComparator[] distancesToFind = new IComparator[this.distancesCount];
+        distancesToFind[0] = new Frechet();
+        distancesToFind[1] = new GromovFrechet();
 
-        for (MatOfPoint contourA : contour1) {
-            double iterationResult = 0.0;
+        for (MatOfPoint contourA : contoursA) {
+            double[] iterationResults = new double[this.distancesCount];
 
             Contour cA = new Contour();
             cA.set(contourA.toList());
@@ -65,33 +48,39 @@ public class Comparator {
 
             cA.rotate(cA.getAngle(), center);
 
-            for (MatOfPoint contourB : contour2) {
+            for (MatOfPoint contourB : contoursB) {
                 Contour cB = new Contour();
                 cB.set(contourB.toList());
                 cB.move(cA.getContourCenter());
 
-                for (int i = 0; i < cB.get().size(); i++) {
-                    double localAngle = cB.getAngle(cB.get(i), center);
-                    cB.rotate(localAngle, center);
+                double angle = cB.getAngle();
+                cB.rotate(angle, center);
 
-                    for (int k=0;k<icontour.size(); k++) {
-                        res[k] = icontour.get(k).getDistance(cA.get(), cB.get());
+                for (int i=0; i<this.distancesCount; i++) {
+                    double distanceResult;
+
+                    if (distancesToFind[i].isGromovMode()) {
+                        distanceResult = distancesToFind[i].getDistance(cA.get(), cB.get());
+                    } else {
+                        distanceResult = distancesToFind[i].getDistance(contourA.toList(), contourB.toList());
                     }
 
-                    double tempResult = frechet.getDistance(cA.get(), cB.get());
-
-                    if (firstIteration || !firstIteration && tempResult < iterationResult) {
-                        iterationResult = tempResult;
-                        firstIteration = false;
-                    }
-
-                    cB.rotate(-localAngle, center);
+                    iterationResults[i] = firstIteration ? distanceResult : Math.min(iterationResults[i], distanceResult);
                 }
+                firstIteration = false;
             }
-            result = Math.max(result, iterationResult);
+
+            for (int i=0; i<this.distancesCount; i++) {
+                results[i] = Math.max(results[i], iterationResults[i]);
+            }
+        }
+
+        double result = 0;
+        for (int i=0; i<this.distancesCount; i++) {
+            result += distancesRanks[i] * results[i];
         }
 
         return result;
     }
-    */
 }
+

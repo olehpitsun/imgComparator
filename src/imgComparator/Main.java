@@ -21,10 +21,8 @@ public class Main {
 
     public static void main(String[] args) {
 
-        String image1 = "C:\\Projects\\images-comparator-master\\images-comparator\\images\\image1.png";
-        String image2 = "C:\\Projects\\images-comparator-master\\images-comparator\\images\\image2.png";
-
         Comparator comparator = new Comparator();
-        comparator.compare(image1, image2);
+        double result = comparator.compare("src\\images\\image1.png", "src\\images\\image1.png");
+        System.out.println("RESULT = " + result);
     }
 }

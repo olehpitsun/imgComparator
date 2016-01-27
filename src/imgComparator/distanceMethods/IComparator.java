@@ -1,6 +1,7 @@
 package imgComparator.distanceMethods;
 
 import org.opencv.core.MatOfPoint;
+import org.opencv.core.Point;
 
 import java.util.List;
 
@@ -9,5 +10,6 @@ import java.util.List;
  */
 public interface IComparator {
 
-    double getDistance(List<MatOfPoint> contour1, List<MatOfPoint> contour2);
+    boolean isGromovMode();
+    double getDistance(List<Point> contour1, List<Point> contour2);
 }
