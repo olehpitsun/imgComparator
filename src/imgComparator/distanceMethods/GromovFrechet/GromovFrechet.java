@@ -2,10 +2,7 @@ package imgComparator.distanceMethods.GromovFrechet;
 
 import imgComparator.distanceMethods.Frechet.Frechet;
 import imgComparator.distanceMethods.IComparator;
-import imgComparator.tools.Contour;
-import org.opencv.core.MatOfPoint;
 import org.opencv.core.Point;
-
 import java.util.List;
 
 /**
@@ -21,3 +18,4 @@ public class GromovFrechet implements IComparator {
         return frechet.getDistance(contour1, contour2);
     }
 }
+

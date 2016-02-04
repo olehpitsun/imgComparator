@@ -1,13 +1,8 @@
 package imgComparator.distanceMethods.Frechet;
 
 import imgComparator.distanceMethods.IComparator;
-import imgComparator.tools.Contour;
 import imgComparator.tools.GeometryUtils;
-import imgComparator.tools.ImageOperations;
-import org.opencv.core.MatOfPoint;
 import org.opencv.core.Point;
-
-import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -49,7 +44,6 @@ public class Frechet implements IComparator {
 
         this.ca = new double[aSize][bSize];
 
-        // ���������� ����� -1
         for(int i=0; i<aSize; i++) {
             for(int j=0; j<bSize; j++) {
                 this.ca[i][j] = -1;
@@ -57,7 +51,6 @@ public class Frechet implements IComparator {
         }
         return this.c(aSize-1, bSize-1);
     }
-
 
     public double getDistance(List<Point> contour1, List<Point> contour2) {
         return this.frechet(contour1, contour2);
